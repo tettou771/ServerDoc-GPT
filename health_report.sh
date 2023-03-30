@@ -32,17 +32,17 @@ execute_command() {
   
   output=$(eval $cmd)
   
-  echo "### $title"
-  echo "\`\`\`"
-  echo "$cmd"
-  echo "$output"
-  echo "\`\`\`"
-  echo ""
+#  echo "### $title"
+#  echo "\`\`\`"
+#  echo "$cmd"
+#  echo "$output"
+#  echo "\`\`\`"
+#  echo ""
   
-  if [ -n "$description" ]; then
-    echo "$description"
-    echo ""
-  fi
+#  if [ -n "$description" ]; then
+#    echo "$description"
+#    echo ""
+#  fi
 }
 
 # Main script
@@ -80,8 +80,6 @@ messages=(
 # Convert messages array to a JSON string
 messages_json="["$(IFS=,; echo "${messages[*]}")"]"
 
-echo "Messages: $messages_json"
-
 # Send a request to the OpenAI API using GPT-3.5-turbo
 RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
   -H "Content-Type: application/json" \
@@ -95,7 +93,7 @@ RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
     "temperature": 0.5
   }')
 
-echo "Response: $RESPONSE"
+#echo "Response: $RESPONSE"
 
 # Check response status code
 RESPONSE_CODE=$(echo $RESPONSE | jq -r '.code')
@@ -105,6 +103,6 @@ if [ "$RESPONSE_CODE" != "null" ]; then
 fi
 
 # Parse response and print generated text
-GENERATED_TEXT=$(echo $RESPONSE | jq -r '.choices[].text')
+GENERATED_TEXT=$(echo $RESPONSE | jq -r '.choices[].message.content')
 echo $GENERATED_TEXT
 
