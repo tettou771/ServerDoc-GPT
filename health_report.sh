@@ -7,19 +7,19 @@ if ! which jq >/dev/null; then
   exit 1
 fi
 
-# check API_KEY
+# check api_key
 if [ -z "$1" ]; then
-  echo "Error: API_KEY is missing."
-  echo "Usage: $0 <API_KEY>"
+  echo "Error: api_key is missing."
+  echo "Usage: $0 <api_key>"
   exit 1
 fi
 
 # Load settings from config file
-CONFIG_FILE="$(dirname "$0")/config.sh"
-CONFIG_EXAMPLE_FILE="$(dirname "$0")/config-example.sh"
+config_file="$(dirname "$0")/config.sh"
+config_example_file="$(dirname "$0")/config-example.sh"
 
-if [ ! -f "$CONFIG_FILE" ]; then
-  cp "$CONFIG_EXAMPLE_FILE" "$CONFIG_FILE"
+if [ ! -f "$config_file" ]; then
+  cp "$config_example_file" "$config_file"
 fi
 
 source "$(dirname "$0")/config.sh"
@@ -30,33 +30,24 @@ execute_command() {
   cmd="$2"
   description="$3"
   
-  output=$(eval $cmd)
-  
-#  echo "### $title"
-#  echo "\`\`\`"
-#  echo "$cmd"
-#  echo "$output"
-#  echo "\`\`\`"
-#  echo ""
-  
-#  if [ -n "$description" ]; then
-#    echo "$description"
-#    echo ""
-#  fi
+  output+="## $title\n"
+  output+="## $description\n\n"
+  output+="$cmd\n\n"
+  output+=$(eval $cmd)
+  output+="\n\n"
 }
 
 # Main script
 
 # Combine output of all commands into single string
 output=""
-for title in "${!COMMANDS[@]}"; do
+for title in "${!commands[@]}"; do
   # コロンで区切られたコマンドと説明文を抽出
-  cmd_and_desc=${COMMANDS["$title"]}
+  cmd_and_desc=${commands["$title"]}
   IFS=":" read -ra cmd_and_desc_arr <<< "$cmd_and_desc"
   cmd="${cmd_and_desc_arr[0]}"
   desc="${cmd_and_desc_arr[1]}"
-  execute_command "$title" "${cmd_and_desc_arr[0]}" "${cmd_and_desc_arr[1]}"
-  output+="### ${command[0]}\n\`\`\`\n${command[1]}\n${output}\n\`\`\`\n\n${command[2]}\n\n"
+  execute_command "$title" "$cmd" "$desc"
 done
 
 json_escape() {
@@ -64,11 +55,11 @@ json_escape() {
 }
 
 # Use the function to escape your $output variable
-escaped_prompt=$(json_escape "$PROMPT")
+escaped_prompt=$(json_escape "$prompt")
 escaped_output=$(json_escape "$output")
 
 # Send request to API
-API_KEY=$1
+api_key=$1
 
 dummy="Hello,GPT!"
 # Define messages for conversation
@@ -81,9 +72,9 @@ messages=(
 messages_json="["$(IFS=,; echo "${messages[*]}")"]"
 
 # Send a request to the OpenAI API using GPT-3.5-turbo
-RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
+response=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $API_KEY" \
+  -H "Authorization: Bearer $api_key" \
   -d '{
     "model": "gpt-3.5-turbo",
     "messages": '"$messages_json"',
@@ -93,16 +84,44 @@ RESPONSE=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
     "temperature": 0.5
   }')
 
-#echo "Response: $RESPONSE"
+echo "Response: $response"
 
 # Check response status code
-RESPONSE_CODE=$(echo $RESPONSE | jq -r '.code')
-if [ "$RESPONSE_CODE" != "null" ]; then
-  echo "Failed to generate text. Response code: $RESPONSE_CODE"
+response_code=$(echo $response | jq -r '.code')
+if [ "$response_code" != "null" ]; then
+  echo "Failed to generate text. Response code: $response_code"
   exit 1
 fi
 
 # Parse response and print generated text
-GENERATED_TEXT=$(echo $RESPONSE | jq -r '.choices[].message.content')
-echo $GENERATED_TEXT
+generated_text=$(echo $response | jq -r '.choices[].message.content')
+echo $generated_text
+
+
+# Extract the title and body from generated_text
+title=$(echo "$generated_text" | head -n 1)
+body=$(echo "$generated_text" | tail -n +2)
+
+# Create 'log' directory if it doesn't exist
+mkdir -p log
+
+# Get current date and time
+current_datetime=$(date "+%Y-%m-%d_%H-%M-%S")
+
+# Set log file name based on the title (PASSED, WARNING, or ERROR)
+log_filename="log/${current_datetime}_${title}.log"
+
+# Save the log
+echo -e "Title: ${title}\n\nBody:\n${body}\n\n${output}" > "$log_filename"
+
+# send mail 
+# Check if the first line starts with "REPORT:" or not
+if [[ ! $title =~ ^PASSED: ]] && [[ ! -z "$email" ]]; then
+  # Add output to the body
+  body=$(echo -e "${body}\n\n${output}")
+
+  # Send email using mail command
+  echo -e "$body" | mail -s "$title" "$email"
+fi
+
 

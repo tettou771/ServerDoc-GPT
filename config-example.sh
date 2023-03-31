@@ -1,11 +1,21 @@
 #!/bin/bash
 
 # Define array of commands
-declare -A COMMANDS=(
-  ["Top processes"]="top -n 1 -b | head -n 20:Displays the top processes by CPU usage"
-  ["Disk usage"]="df -h:Displays the disk usage for all files and directories in the root directory"
-  ["Memory usage"]="free:Check memory usage"
+declare -A commands=(
+  ["Top processes"]="top -n 1 -b | head -n 20:Displays the top processes by CPU usage. 問題がある場合は、pidだけでなくプロセス名も書いてください。"
+  ["Disk usage"]="df -h:Displays the disk usage for all files and directories in the root directory."
+  ["Memory usage"]="free:Check memory usage. "
 )
 
+#email="your@email.com"
 
-PROMPT="サーバの健康状態について日本語でレポートしてください。緊急で対応する必要がない場合は、最初の行を PASSED にして、懸念されることがある場合は WARNING として、すぐに対応が必要な場合は ERROR にしてください。レポートは3行目から始めてください。"
+prompt="あなたはサーバー管理者です。サーバの健康状態について日本語でレポートして、オーナーが対応するべきことがあれば教えてください。
+最初の行をタイトルにして、20文字以内で表現してください。
+2行目から犬のAAをつけて、深刻度に応じて犬の表情を変えてください。
+AAの下にレポート本文を書いてください。
+
+最初の行の最初の単語で深刻度を表します。以下の3種類から選んで単語を入れてください。PASSED 以外の時はメールでメッセージが送信される仕組みになっています。
+PSSED: 心配なし。
+WARNING: すぐの対応は不要だが、懸念されることがある。
+ERROR: すぐに対応が必要な問題がある。"
+
