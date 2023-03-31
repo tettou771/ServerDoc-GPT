@@ -1,5 +1,9 @@
 #!/bin/bash
 
+##----------------
+## Prepare parametors
+##----------------
+
 # check jq command exists
 if ! which jq >/dev/null; then
   echo "jqコマンドがインストールされていません。jqコマンドをインストールしてください。"
@@ -23,6 +27,10 @@ if [ ! -f "$config_file" ]; then
 fi
 
 source "$(dirname "$0")/config.sh"
+ 
+##----------------
+## Exec health check commands
+##----------------
 
 # Define function to execute a command and format the output
 execute_command() {
@@ -37,8 +45,6 @@ execute_command() {
   output+="\n\n"
 }
 
-# Main script
-
 # Combine output of all commands into single string
 output=""
 for title in "${!commands[@]}"; do
@@ -49,6 +55,10 @@ for title in "${!commands[@]}"; do
   desc="${cmd_and_desc_arr[1]}"
   execute_command "$title" "$cmd" "$desc"
 done
+
+##----------------
+## Make HTTP request
+##----------------
 
 json_escape() {
   printf '%s' "$1" | jq -Rs .
@@ -70,6 +80,10 @@ messages=(
 
 # Convert messages array to a JSON string
 messages_json="["$(IFS=,; echo "${messages[*]}")"]"
+
+##----------------
+## Ask to GPT
+##----------------
 
 # Send a request to the OpenAI API using GPT-3.5-turbo
 response=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
@@ -94,13 +108,16 @@ if [ "$response_code" != "null" ]; then
 fi
 
 # Parse response and print generated text
-generated_text=$(echo $response | jq -r '.choices[].message.content')
-echo $generated_text
+gpt_answer=$(echo $response | jq -r '.choices[].message.content')
+echo $gpt_answer
 
+##----------------
+## Log file
+##----------------
 
-# Extract the title and body from generated_text
-title=$(echo "$generated_text" | head -n 1)
-body=$(echo "$generated_text" | tail -n +2)
+# Extract the title and body from gpt_answer
+title=$(echo "$gpt_answer" | head -n 1)
+body=$(echo "$gpt_answer" | tail -n +2)
 
 # Set log directory in user's home directory
 log_dir="${HOME}/ServerDoc-GPT_logs"
@@ -117,14 +134,17 @@ log_filepath="${log_dir}/${current_datetime}_${title}.log"
 # Save the log
 echo -e "Title: ${title}\n\nBody:\n${body}\n\n${output}" > "$log_filepath"
 
-# send mail 
+##----------------
+## Send mail
+##----------------
+
 # Check if the first line starts with "REPORT:" or not
 if [[ ! $title =~ ^PASSED: ]] && [[ ! -z "$email" ]]; then
   # Add output to the body
   body=$(echo -e "${body}\n\n${output}")
 
   # Send email using mail command
-  echo -e "$body" | mail -s "$title" "$email"
+  echo -e "$body" | mail -s "ServerDoc-GPT $title" "$email"
 fi
 
 
