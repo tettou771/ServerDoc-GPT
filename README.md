@@ -1,7 +1,38 @@
-# ServerDoc-GPT
+# Server Health Report
 
-A tool for monitoring server health and generating natural language reports using OpenAI's GPT-3.5 language model
+このスクリプトは、サーバーの健康状態をチェックし、それに基づいてOpenAI GPT-3.5-turboを使って日本語のレポートを生成します。問題がある場合は、設定されたメールアドレスに警告またはエラーメッセージを送信します。
 
-# Author
+## 使い方
+
+1. `config.sh` を編集して、サーバーの健康状態をチェックするためのコマンドとその説明を定義します。`config-example.sh` を参考にしてください。
+
+2. `health_report.sh` スクリプトにOpenAI APIキーを引数として渡して実行します。
+
+```
+./health_report.sh <your_api_key>
+```
+
+## ファイル構成
+
+- `config-example.sh`: サーバーの健康状態をチェックするためのコマンドとその説明を定義するサンプルファイルです。
+- `health_report.sh`: サーバーの健康状態をチェックし、GPT-3.5-turboを使ってレポートを生成し、必要に応じてメールを送信するメインスクリプトです。
+
+## 注意事項
+
+- スクリプトを実行する前に、`jq` コマンドがインストールされていることを確認してください。インストールされていない場合は、以下のコマンドを使ってインストールしてください。
+
+```
+sudo apt-get install jq
+```
+
+- メール送信には、`mail` コマンドを使用しています。これはSMTP認証に対応していません。認証が必要なメールサービスを使用する場合は、`msmtp` や `sendmail` などのSMTP認証に対応したメール送信ツールを使用してください。
+
+- GPT-3.5-turboを使うために、OpenAI APIキーが必要です。スクリプトの引数として渡してください。
+
+## ログファイル
+
+スクリプトが生成したレポートは、ユーザーのホームディレクトリ内の `ServerDoc-GPT_logs` ディレクトリに保存されます。ログファイルの名前は、日付とレポートのタイトル（PASSED、WARNING、またはERROR）に基づいています。
+
+## Author
 
 [tettou771](http://github.com/tettou771)
