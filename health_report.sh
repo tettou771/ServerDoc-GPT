@@ -102,17 +102,20 @@ echo $generated_text
 title=$(echo "$generated_text" | head -n 1)
 body=$(echo "$generated_text" | tail -n +2)
 
+# Set log directory in user's home directory
+log_dir="${HOME}/ServerDoc-GPT_logs"
+
 # Create 'log' directory if it doesn't exist
-mkdir -p log
+mkdir -p $log_dir
 
 # Get current date and time
 current_datetime=$(date "+%Y-%m-%d_%H-%M-%S")
 
 # Set log file name based on the title (PASSED, WARNING, or ERROR)
-log_filename="log/${current_datetime}_${title}.log"
+log_filepath="${log_dir}/${current_datetime}_${title}.log"
 
 # Save the log
-echo -e "Title: ${title}\n\nBody:\n${body}\n\n${output}" > "$log_filename"
+echo -e "Title: ${title}\n\nBody:\n${body}\n\n${output}" > "$log_filepath"
 
 # send mail 
 # Check if the first line starts with "REPORT:" or not
