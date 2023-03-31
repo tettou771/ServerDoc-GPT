@@ -139,7 +139,7 @@ echo -e "Title: ${title}\n\nBody:\n${body}\n\n${output}" > "$log_filepath"
 ##----------------
 
 # Check if the first line starts with "REPORT:" or not
-if [[ ! $title =~ ^PASSED: ]] && [[ ! -z "$email" ]]; then
+if [[ ! $title =~ ^PASSED ]] && [[ ! -z "$email" ]]; then
   # Add output to the body
   body=$(echo -e "${body}\n\n${output}")
 
