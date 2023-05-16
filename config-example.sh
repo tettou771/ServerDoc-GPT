@@ -8,6 +8,7 @@ declare -A commands=(
   ["Top processes"]="top -n 1 -b | head -n 20:Displays the top processes by CPU usage. If you find probrem, please write prcess name with pid."
   ["Disk usage"]="df -h:Displays the disk usage for all files and directories in the root directory."
   ["Memory usage"]="free:Check memory usage. "
+  ["Current time"]="date:Get current date and time."
 )
 
 # Report mail
@@ -24,5 +25,7 @@ WARNING: 急ぎの対応は不要だが、懸念されることがある。
 ERROR: すぐに対応が必要な問題がある。
 
 あなたが送信するメッセージは、コメントアウトなどは不要です。
-特に、深刻度の単語の前には何も文字を入れないでください。"
+特に、深刻度の単語の前には何も文字を入れないでください。
+
+また、今日の日付に関連したことを何か無駄にひとことつけてください。"
 

@@ -94,7 +94,7 @@ response=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
   -d '{
     "model": "'"$gpt"'",
     "messages": '"$messages_json"',
-    "max_tokens": 200,
+    "max_tokens": 1000,
     "n": 1,
     "stop": null,
     "temperature": 0.5
