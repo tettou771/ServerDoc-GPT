@@ -140,13 +140,10 @@ echo -e "Title: ${title}\n\nBody:\n${body}\n\n${output}" > "$log_filepath"
 ## Send mail
 ##----------------
 
-# Check if the first line starts with "REPORT:" or not
-if [[ ! $title =~ ^PASSED ]] && [[ ! -z "$email" ]]; then
-  # Add output to the body
-  body=$(echo -e "${body}\n\n${output}")
+# Add output to the body
+body=$(echo -e "${body}\n\n${output}")
 
-  # Send email using mail command
-  echo -e "$body" | mail -s "ServerDoc-GPT $title" "$email"
-fi
+# Send email using mail command
+echo -e "$body" | mail -s "ServerDoc-GPT $title" "$email"
 
 

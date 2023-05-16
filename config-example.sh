@@ -10,7 +10,7 @@ declare -A commands=(
   ["Memory usage"]="free:Check memory usage. "
 )
 
-# Report mail (send only WARNING or ERROR)
+# Report mail
 #email="your@email.com"
 
 prompt="あなたはサーバー管理者です。サーバの健康状態について日本語でレポートして、オーナーが対応するべきことがあれば教えてください。
