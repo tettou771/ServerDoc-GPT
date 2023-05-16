@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# GPT version (default: gpt-3.5-turbo)
+#gpt="gpt-3.5-turbo"
+
 # Define array of commands
 declare -A commands=(
   ["Top processes"]="top -n 1 -b | head -n 20:Displays the top processes by CPU usage. If you find probrem, please write prcess name with pid."

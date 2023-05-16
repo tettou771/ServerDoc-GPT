@@ -26,6 +26,8 @@ if [ ! -f "$config_file" ]; then
   cp "$config_example_file" "$config_file"
 fi
 
+: ${gpt:=gpt-3.5-turbo}
+
 source "$(dirname "$0")/config.sh"
  
 ##----------------
@@ -85,12 +87,12 @@ messages_json="["$(IFS=,; echo "${messages[*]}")"]"
 ## Ask to GPT
 ##----------------
 
-# Send a request to the OpenAI API using GPT-3.5-turbo
+# Send a request to the OpenAI API
 response=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $api_key" \
   -d '{
-    "model": "gpt-3.5-turbo",
+    "model": "'"$gpt"'",
     "messages": '"$messages_json"',
     "max_tokens": 200,
     "n": 1,
