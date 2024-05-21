@@ -144,6 +144,9 @@ echo -e "Title: ${title}\n\nBody:\n${body}\n\n${output}" > "$log_filepath"
 body=$(echo -e "${body}\n\n${output}")
 
 # Send email using mail command
-echo -e "$body" | mail -s "ServerDoc-GPT $title" "$email"
+# Construct email content
+email_content="To: $email\nSubject: $title\n\n$body"
 
+# Send email using sendmail
+echo -e "$email_content" | sendmail -t
 
